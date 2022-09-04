@@ -4,14 +4,19 @@ const cors = require('cors')
 const joi = require('joi')
 const router = require('./router/user')
 const infoRouter = require('./router/userinfo')
-const config = require('./config')
+// 导入并使用文章分类路由模块
+const artCateRouter = require('./router/artcate')
+const articleRouter = require('./router/article')
+const config = require('./router_handler/config')
+const bodyParser = require('body-parser')
 // 解析 token 的中间件
 const expressJWT = require('express-jwt')
 
 const app = express()
 
 app.use(cors())
-app.use(express.urlencoded({ extended: false }))
+// app.use(express.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }))
 
 // 中间件必须在路由前
 app.use(function(req, res, next){
@@ -35,11 +40,16 @@ app.use(function (err, req, res, next) {
     // 未知错误
     res.cc(err)
   })
-
+  
+// 托管静态资源文件
+app.use('/uploads', express.static('./uploads'))
 
 app.use('/api', router)
 app.use('/my', infoRouter)
 
+// 为文章分类的路由挂载统一的访问前缀 /my/article
+app.use('/my/artcate', artCateRouter)
+app.use('/my/article', articleRouter)
 
 app.listen(3007, function(){
     console.log('api server running at http://127.0.0.1:3007')

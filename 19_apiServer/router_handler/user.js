@@ -2,7 +2,7 @@ const db = require("../db/index");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 // 导入配置文件
-const config = require("../config");
+const config = require("./config");
 
 exports.regUser = (req, res) => {
   const userInfo = req.body;
@@ -41,15 +41,15 @@ exports.regUser = (req, res) => {
 
 exports.login = (req, res) => {
   const userInfo = req.body;
-
   db.query(
     "select * from ev_users where username=?",
     userInfo.username,
     function (err, results) {
       if (err) {
+        console.log('wu'); 
         return res.cc(err);
       }
-      if (results.length !== 1) return res.cc("登录失败！");
+      if (results.length !== 1) {console.log('wu'); return  res.cc("登录失败！");}
       // 拿着用户输入的密码,和数据库中存储的密码进行对比
       const compareResult = bcrypt.compareSync(
         userInfo.password,
@@ -57,18 +57,20 @@ exports.login = (req, res) => {
       );
       // 如果对比的结果等于 false, 则证明用户输入的密码错误
       if (!compareResult) {
+        console.log('wu');
         return res.cc("登录失败！");
       }
       const user = { ...results[0], password: "", user_pic: "" };
       const tokenStr = jwt.sign(user, config.jwtSecretKey, {
         expiresIn: "10h", // token 有效期为 10 个小时
       });
+      res.send({
+        status: 0,
+        message: "登录成功！",
+        // 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
+        token: "Bearer " + tokenStr,
+      });
     }
   );
-  res.send({
-    status: 0,
-    message: "登录成功！",
-    // 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
-    token: "Bearer " + tokenStr,
-  });
+ 
 };

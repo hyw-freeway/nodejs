@@ -24,7 +24,7 @@ router.post('/userinfo', expressJoi(update_userinfo_schema), userinfo_handler.up
 router.post('/updatepwd', expressJoi(update_password_schema), userinfo_handler.updatePassword)
 
 // 更新头像
-router.post('/update/avatar',expressJoi(update_avatar_schema), user_handler_updateAvatar)
+router.post('/update/avatar',expressJoi(update_avatar_schema), userinfo_handler.updateAvatar)
 
 // 向外共享路由对象
 module.exports = router

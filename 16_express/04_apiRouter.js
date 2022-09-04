@@ -25,3 +25,9 @@ router.delete('/delete', (req, res) => {
     })
   })
 module.exports = router;
+
+// body：请求体中的数据
+
+// query：请求的参数，URL后面以？的形式，例：user?id
+
+// params：请求的参数，URL后面以/的形式，例：user/:id
