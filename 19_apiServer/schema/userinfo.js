@@ -11,15 +11,15 @@ const joi = require('joi')
 
 // 定义 id, nickname, emial 的验证规则
 const id = joi.number().integer().min(1)
-const nickname = joi.string().required()
-const email = joi.string().email().required()
+const username = joi.string()
+const email = joi.string().email()
 
 // 注册和登录表单的验证规则对象
 exports.update_userinfo_schema = {
   // 表示需要对 req.body 中的数据进行验证
   body: {
     id,
-    nickname,
+    username,
     email,
   },
 }

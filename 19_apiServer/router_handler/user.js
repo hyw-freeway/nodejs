@@ -25,7 +25,7 @@ exports.regUser = (req, res) => {
   userInfo.password = bcrypt.hashSync(userInfo.password, 10);
   db.query(
     "insert into ev_users set ?",
-    { username: userInfo.username, password: userInfo.password },
+    { username: userInfo.username, password: userInfo.password, email: userInfo.email },
     function (err, results) {
       if (err) {
         return res.cc(err);
@@ -60,15 +60,17 @@ exports.login = (req, res) => {
         console.log('wu');
         return res.cc("登录失败！");
       }
-      const user = { ...results[0], password: "", user_pic: "" };
+      const user = { ...results[0], password: ""};
       const tokenStr = jwt.sign(user, config.jwtSecretKey, {
         expiresIn: "10h", // token 有效期为 10 个小时
       });
+      console.log(user)
       res.send({
         status: 0,
         message: "登录成功！",
         // 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
         token: "Bearer " + tokenStr,
+        user
       });
     }
   );

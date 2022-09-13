@@ -25,7 +25,7 @@ const upload = multer({ dest: path.join(__dirname, "../uploads") });
 //       再使用 expressJoi 对解析的表单数据进行验证
 router.post(
   "/add",
-  upload.single("cover_img"),
+  // upload.single("cover_img"),
   expressJoi(add_article_schema),
   article_handler.addArticle
 );
@@ -35,6 +35,14 @@ router.get(
   "/list",
   expressJoi(get_articleList_schema),
   article_handler.getArticleList
+);
+router.get(
+  "/listbytime",
+  article_handler.getArticleListByTime
+);
+router.get(
+  "/listbyuid",
+  article_handler.getArticleListByUid
 );
 
 // 3、获取-文章详情
@@ -46,9 +54,23 @@ router.get(
 
 // 4、删除-文章
 router.delete(
-  "/info",
+  "/delete",
   expressJoi(get_delArticle_schema),
   article_handler.delArticle
 );
+
+//5. 修改文章
+router.post(
+  "/update",
+  expressJoi(get_delArticle_schema),
+  article_handler.updateArticle
+);
+
+router.post(
+  '/uploadpic',  
+  article_handler.addPic       
+);
+
+
 // 向外共享路由对象
 module.exports = router;

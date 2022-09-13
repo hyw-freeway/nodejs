@@ -23,16 +23,94 @@ exports.getUserInfo = (req, res) => {
   );
 };
 
+//根据用户id获取用户信息
+exports.getUserInfoById = (req, res) => {
+  db.query(
+    "select id, username, nickname, email, user_pic from ev_users where id=?",
+    req.query.id,
+    (err, results) => {
+      if (err) return res.cc(err);
+      // 2. 执行 SQL 语句成功，但是查询到的数据条数不等于 1
+      if (results.length !== 1) return res.cc("获取用户信息失败！");
+      res.send({
+        status: 0,
+        message: "获取用户基本信息成功！",
+        data: results[0],
+      });
+    }
+  );
+};
+
+//获取所有用户信息
+exports.getUserAll = (req, res) => {
+  db.query(
+    "select * from ev_users",
+    (err, results) => {
+      if (err) return res.cc(err);
+      // // 2. 执行 SQL 语句成功，但是查询到的数据条数不等于 1
+      // if (results.length !== 1) return res.cc("获取用户信息失败！");
+      res.send({
+        status: 0,
+        message: "获取所有用户成功！",
+        data: results,
+      });
+    }
+  );
+};
+
 //更新用户信息
 exports.updateUserInfo = (req, res) => {
     db.query(
-      "update ev_users set ? where id=?",
-      [req.body, req.user.id],
+      "update ev_users set username=?, email=? where id=?",
+      [req.body.username,req.body.email, req.user.id],
       (err, results) => {
         if (err) return res.cc(err);
         // 2. 执行 SQL 语句成功，但是查询到的数据条数不等于 1
         if (results.affectedRows !== 1) return res.cc("修改用户信息失败！");
-        res.cc('修改用户基本信息成功！', 0)
+        db.query(
+          "update ev_articles set author_name=? where author_id=?",
+          [req.body.username, req.user.id],
+          (err, results) => {
+            if (err) return res.cc(err);
+            db.query(
+              "select username, email from ev_users where id=?",
+              [ req.user.id],
+              (err, results) => {
+                if (err) return res.cc(err);
+               
+                res.send({results})
+              }
+            );
+          }
+        );
+      }
+    );
+  };
+
+  //更新用户juese
+exports.updateUserRoles = (req, res) => {
+  db.query(
+    "update ev_users set roles=? where id=?",
+    [req.body.roles, req.body.id],
+    (err, results) => {
+      if (err) return res.cc(err);
+      // 2. 执行 SQL 语句成功，但是查询到的数据条数不等于 1
+      if (results.affectedRows !== 1) return res.cc("修改用户信息失败！");
+      res.send(req.body.roles)
+    }
+  );
+};
+
+  //删除用户
+  exports.deleteUser = (req, res) => {
+    console.log(req)
+    db.query(
+      "delete from ev_users where id=?",
+      [req.query.id],
+      (err, results) => {
+        if (err) return res.cc(err);
+       
+        res.send("ok")
       }
     );
   };
@@ -56,7 +134,7 @@ exports.updateUserInfo = (req, res) => {
 
   //更新头像
 exports.updateAvatar = (req, res) => {
-  db.query('update ev_users set user_pic=? where id=?', [req.body.avatar, req.user.id], (err, results)=>{
+  db.query('update ev_users set user_pic=? where id=?', [req.body.picname, req.user.id], (err, results)=>{
     // 执行 SQL 语句失败
   if (err) return res.cc(err)
 
